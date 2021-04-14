@@ -1,0 +1,9 @@
+[Unit]
+Description=Grab Sensor Data Timer
+
+[Timer]
+OnUnitActiveSec=3000s
+OnBootSec=30s
+
+[Install]
+WantedBy=timers.target

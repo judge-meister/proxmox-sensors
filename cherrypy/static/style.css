@@ -1,0 +1,51 @@
+/*
+ *  css
+ */
+
+body {
+    background-color: #000;
+    color: #fff;
+    padding: 10px;
+}
+
+td {
+    padding: 0px;
+    vertical-align: top;
+}
+
+div#sensors {
+    padding: 10px;
+    border: 1px solid #333;
+    margin-right: 10px;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: auto auto auto auto;
+}
+
+h3,h1 {
+    margin-top: 5px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: normal;
+}
+meter {
+    width: 63px;
+    height: 10px;
+}
+meter::-webkit-meter-bar {
+    background: none;
+    background-color: #333;
+    box-shadow: 0 5px 5px -5px #333 inset;
+    width: 63px;
+    height: 10px;
+}
+meter#bullet {
+    width: 10px;
+    height: 10px;
+}
+meter#bullet::-webkit-meter-bar {
+    width: 10px;
+    height: 10px;
+}
+
