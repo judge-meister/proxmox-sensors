@@ -18,10 +18,13 @@ sudo pip3 -q install -r requirements.txt
 
 # create a folder in opt and install to there
 sudo mkdir -p /opt/proxmox-sensors/static
-sudo -m 755 install -t /opt/proxmox-sensors  my_sensors.py zfs_drive_temps.sh
-sudo -m 644 install -t /opt/proxmox-sensors/static  static/style.css
+sudo install -m 755 -t /opt/proxmox-sensors  my_sensors.py zfs_drive_temps.sh
+sudo install -m 644 -t /opt/proxmox-sensors/static  static/style.css
 
 # install systemd files
 sudo install -m 644 -t /etc/systemd/system  systemd/my_sensors.service systemd/my_sensors.timer
 sudo systemctl daemon-reload
+
+sudo systemctl start my_sensors.timer
+sudo systemctl enable my_sensors.timer
 
