@@ -199,7 +199,7 @@ if __name__ == '__main__':
             get_zpool_status()
             sys.exit()
 
-    pwd = '/root/proxmox_cherrypy' #os.getcwd()
+    pwd = '/opt/proxmox-sensors' #os.getcwd()
     hostname = socket.gethostname()
     open(pwd+'/error.log', 'w').write('')
 
