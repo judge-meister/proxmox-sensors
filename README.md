@@ -8,6 +8,8 @@ install_dark_mode.sh - will download and install the Dark theme for the Proxmox 
 
 install_cherrypy_app.sh - will install the sensors webapp based on the CherryPy framework.
 
+Note: the installers presume that you have a working sudo configuration.
+
 ## Requirements
 
 This repo needs python >= 3.7, pip3 installed.
