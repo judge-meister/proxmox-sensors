@@ -97,7 +97,7 @@ install_developer_mode()
 # ----------
 
 root=$(pwd)
-if [ ! -d cherrypy ] && error_exit "Must run $0 from root of repo."
+if [ "${root}" != "$(git rev-parse --show-toplevel 2>/dev/null)" ] && error_exit "Must run $0 from root of repo."
 
 cd cherrypy
 
@@ -109,7 +109,10 @@ then
   if [ "$ans" == "y" ]
   then
     uninstall_service
-    [ "$install_dir" != "${root}/cherrypy" ] && remove_cherrypy
+    cd $install_dir
+    [ "$(git rev-parse --is-inside-work-tree &>/dev/null; echo "${?}")" != '0' ] && remove_cherrypy
+    #[ "$install_dir" != "${root}/cherrypy" ] && remove_cherrypy
+    cd -
   fi
 fi
 
