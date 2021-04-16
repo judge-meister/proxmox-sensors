@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#set -x
+
 error_exit()
 {
   echo $1
@@ -8,6 +10,7 @@ error_exit()
 
 check_dependencies()
 {
+  echo "Checking Dependencies"
   which python3 >/dev/null
   [ $? -ne 0 ] && error_exit "python3 required"
 
@@ -26,7 +29,7 @@ choice() # give the user a choice with a default option
   t=0
   while [ $t -eq 0 ]
   do
-    echo -n "$text"
+    echo -ne "$text"
     read ans
     [ "$ans" == "" ] && ans=$dflt
     [[ $opts =~ "$ans" ]] && t=1
@@ -37,34 +40,40 @@ query() # ask user for an answer with a default option
 {
   text=$1
   dflt=$2
-  echo -n "$text"
+  echo -ne "$text"
   read ans
   [ "$ans" == "" ] && ans=$dflt
 }
 
 uninstall_service()
 {
-  install_dir=$(dirname $(grep ExecStart cherrypy/systemd/my_sensors.service | awk -F' ' '{print $2}'))
+  echo "Uninstalling Service"
+  install_dir=$(dirname $(grep ExecStart /etc/systemd/system/my_sensors.service | awk -F' ' '{print $2}'))
 
   sudo systemctl stop my_sensors.timer
   sudo systemctl stop my_sensors.service
   sudo systemctl disable my_sensors.timer 
 
-  rm -f /etc/systemd/system/my_sensors.{timer,service}
+  sudo rm -f /etc/systemd/system/my_sensors.{timer,service}
 }
 
 remove_cherrypy()
 {
-  rm -f $install_dir/my_sensors.py $install_dir/zfs_drive_temps.sh $install_dir/error.log
-  rm -rf $install_dir/static/style.css
+  echo "Removing App"
+  if [ "$install_dir" != "" ]
+  then
+    sudo rm -f $install_dir/my_sensors.py $install_dir/zfs_drive_temps.sh $install_dir/error.log
+    sudo rm -rf $install_dir/static/style.css
 
-  # check dir is empty before removing it.
-  [[ -d $install_dir/static ]] && [[ -z "$(ls -A $install_dir/static)" ]] && rm -rf $install_dir/static
-  [[ -d $install_dir ]] && [[ -z "$(ls -A $install_dir)" ]] && rm -rf $install_dir
+    # check dir is empty before removing it.
+    [[ -d $install_dir/static ]] && [[ -z "$(ls -A $install_dir/static)" ]] && sudo rm -rf $install_dir/static
+    [[ -d $install_dir ]] && [[ -z "$(ls -A $install_dir)" ]] && sudo rm -rf $install_dir
+  fi
 }
 
 install_cherrypy()
 {
+  echo "Installing App"
   # create a folder in opt and install to there
   sudo mkdir -p $location/static
   sudo install -m 755 -t $location  my_sensors.py zfs_drive_temps.sh
@@ -73,10 +82,11 @@ install_cherrypy()
 
 install_service()
 {
+  echo "Installing Service"
   # install systemd files
-  sed 's#/opt/proxmox-sensors#'$location'#g' systemd/my_sensors.service systemd/temp.service
+  sed 's#/opt/proxmox-sensors#'$location'#g' systemd/my_sensors.service > systemd/temp.service
   sudo install -m 644 -t /etc/systemd/system systemd/my_sensors.timer
-  sudo install -m 644 -T systemd/temp.service /etc/systems/system/my_sensors.service
+  sudo install -m 644 -T systemd/temp.service /etc/systemd/system/my_sensors.service
   rm -f systemd/temp.service
 
   # start timer service
@@ -87,8 +97,9 @@ install_service()
 
 install_developer_mode()
 {
+  echo "Installing in Developer Mode"
   # use repo as run location
-  location=$(pwd)/cherrypy
+  location=$(pwd)
   install_service
 }
 
@@ -97,31 +108,38 @@ install_developer_mode()
 # ----------
 
 root=$(pwd)
-if [ "${root}" != "$(git rev-parse --show-toplevel 2>/dev/null)" ] && error_exit "Must run $0 from root of repo."
 
+[ "$(git rev-parse --show-toplevel &>/dev/null; echo "${?}")" != '0' ] && error_exit "Must run $(basename $0) from within the proxmox-sensors repoo."
+#[ "${root}" != "$(git rev-parse --show-toplevel 2>/dev/null)" ] && error_exit "Must run $(basename $0) from within of $(dirname $0)."
+
+cd $(git rev-parse --show-toplevel)
 cd cherrypy
-
-check_dependencies
 
 if [ -f /etc/systemd/system/my_sensors.timer ] 
 then
-  choice "Uninstall pre-existing instance ? (y/n) [y] " "yn" "y"
+  choice "\nUninstall pre-existing instance ? (y/n) [y] " "yn" "y"
   if [ "$ans" == "y" ]
   then
     uninstall_service
     cd $install_dir
     [ "$(git rev-parse --is-inside-work-tree &>/dev/null; echo "${?}")" != '0' ] && remove_cherrypy
     #[ "$install_dir" != "${root}/cherrypy" ] && remove_cherrypy
-    cd -
+    cd - >/dev/null
   fi
+else
+  echo "Nothing to uninstall."
 fi
 
-choice "Install as [u]ser or [d]eveloper mode ? [u] " "ud" "u"
+[ "$1" == "-u" ] && exit
+
+choice "\nInstall as [u]ser or [d]eveloper mode ? [u] " "ud" "u"
 install_type=$ans
+
+check_dependencies
 
 case $install_type in
 
-  u) query "Install location [/opt/proxmox-sensors]: " "/opt/proxmox-sensors" ;
+  u) query "\nInstall location [/opt/proxmox-sensors]: " "/opt/proxmox-sensors" ;
      location=$ans ;
      install_cherrypy ; 
      install_service ;;
@@ -129,4 +147,5 @@ case $install_type in
   d) install_developer_mode ;;
 esac
 
-
+# finish
+echo -e "\nNow point your browser at http://$(hostname):8080"
