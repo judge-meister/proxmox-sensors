@@ -3,5 +3,5 @@ Description=Grab Sensor Data
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/python3 /opt/proxmox-sensors/my_sensors.py
+ExecStart=/usr/bin/python3 /opt/proxmox-sensors/my_sensors.py /opt/proxmox-sensors
 

@@ -199,7 +199,9 @@ if __name__ == '__main__':
             get_zpool_status()
             sys.exit()
 
-    pwd = '/opt/proxmox-sensors' #os.getcwd()
+        if os.path.exists(sys.argv[1]):
+            pwd = sys.argv[1]
+
     hostname = socket.gethostname()
     open(pwd+'/error.log', 'w').write('')
 
