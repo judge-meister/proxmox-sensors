@@ -1,5 +1,7 @@
 # proxmox-sensors
 
+![Proxmox-Sensors](https://user-images.githubusercontent.com/70912431/115110622-448c4c00-9f74-11eb-81b8-9b10e0dcf176.png)
+
 ## Installers
 
 install_asus_wmi_sensors.sh - will download, build and install the sensors modules for some X370/X470/B450/X399 Ryzen motherboards.
