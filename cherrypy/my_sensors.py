@@ -3,6 +3,7 @@
 
 import os
 import sys
+import stat
 import socket
 import cherrypy
 import sensors
@@ -100,7 +101,7 @@ def get_zpool_status():
             html += meter+line[1:]+"<br>"
         else:
             html += line+'<br>'
-        print(len(line))
+        #print(len(line))
     html += '</pre>'
     return html
 
@@ -192,7 +193,7 @@ class CherrySensors(object):
 
 if __name__ == '__main__':
 
-    print(sys.argv)
+    #print(sys.argv)
     if len(sys.argv) > 1:
         if sys.argv[1] == "debug":
             #print(get_sensors())
@@ -203,7 +204,10 @@ if __name__ == '__main__':
             pwd = sys.argv[1]
 
     hostname = socket.gethostname()
-    open(pwd+'/error.log', 'w').write('')
+
+    errlog = pwd+'/error.log'
+    open(errlog, 'w').write('')
+    os.chmod(errlog, os.stat(errlog)[stat.ST_MODE]|stat.S_IWGRP|stat.S_IWOTH)
 
     conf = {'/static':{'tools.staticdir.on' : True, 
                        'tools.staticdir.dir': pwd+'/static'},
@@ -214,7 +218,7 @@ if __name__ == '__main__':
                             'server.thread_pool': 10,
                            })
     cherrypy.config.update({'log.access_file': '',
-                            'log.error_file': pwd+'/error.log'})
+                            'log.error_file': errlog})
     cherrypy.config.update({'log.screen': False})
 
     # run the webapp
