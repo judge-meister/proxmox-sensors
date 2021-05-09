@@ -76,7 +76,7 @@ def get_drive_temps(pwd):
 
 def get_zpool_status():
     """call zpool status"""
-    st, ret = unix("su judge -c 'zpool status -c size'")
+    st, ret = unix("ZPOOL_SCRIPTS_AS_ROOT=1 zpool status -c size")
     html = '<pre>\n'
     cksum = False
     for line in ret.split('\n'):
