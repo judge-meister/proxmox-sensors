@@ -32,5 +32,8 @@ do
 done
 
 id=$(ls -l /dev/disk/by-id/ | grep 'nvme-.*' | grep -v -e 'eui\.' -e 'part' | awk -F' ' '{print $9}')
-echo "nvme0 "$(/usr/sbin/smartctl -a /dev/nvme0 | grep Temperature: | awk -F' ' '{print $2}')" Celsius "$id
+if [ "$id" != "" ]
+then
+  echo "nvme0 "$(/usr/sbin/smartctl -a /dev/nvme0 | grep Temperature: | awk -F' ' '{print $2}')" Celsius "$id
+fi
 
