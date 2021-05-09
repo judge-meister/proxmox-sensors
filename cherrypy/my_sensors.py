@@ -108,7 +108,7 @@ def get_zpool_status():
 
 def get_usage():
     """get disk usage"""
-    st, ret = unix("df -h | egrep 'zdata|zvideos|pve|Filesystem'")
+    st, ret = unix("df -h | df | grep -vE ' /dev| /run| /sys| /boot| /etc| /$'")
     html = '<pre>\n'
     for line in ret.split('\n'):
         try:
