@@ -67,7 +67,13 @@ def get_drive_temps(pwd):
     html = '<pre>\n'
     for line in ret.split('\n'):
         if line.find("Celsius") > -1:
-            tempC = int(line.split()[1])
+            try:
+                tempC = int(line.split()[1])
+            except ValueError:
+                #print(f"ERROR in line: {line}")
+                #raise
+                tempC = 0
+                line = line.replace('Celsius', 'N/A')
             html += "<meter max=75 min=0 value=%d high=40 low=30 optimum=19></meter> " % tempC
         html += line.replace(' Celsius', '&deg;C').replace('-',' ').replace('_',' ')+'<br>'
     html += '</pre>'
