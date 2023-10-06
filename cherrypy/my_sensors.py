@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.9
 # -*- coding: utf-8 -*-
 
 import os
@@ -40,10 +40,10 @@ __drives_div__ = ' <div > <h3>Drive Temps:</h3> %s </div>'
 __zpool_div__ = ' <div > <h3>Zpool Status:</h3> %s </div>'
 __usage_div__ = ' <div > <h3>Disk Usage:</h3> %s </div>'
 
-def create_table(col1, col2, col3, col4):
+def create_table(col1, col2, col3, col4, col5=""):
     #html = '<table><tr>\n<td>%s</td>\n<td>%s</td>\n<td>%s</td>\n</tr></table>\n'
-    column1 = '<div id="sensors" class="grid-item">%s%s</div>' % (col1, col2)
-    column2 = '<div id="sensors" class="grid-item">%s%s</div>' % (col3, col4)
+    column1 = '<div id="sensors" class="grid-item sensorsleft">%s%s</div>' % (col1, col2)
+    column2 = '<div id="sensors" class="grid-item sensorsright">%s%s</div>' % (col3, col4)
     html = '<div class="grid-container"> %s %s</div>'
     return html % (column1, column2)
 
@@ -159,7 +159,7 @@ def pysensors():
                         if feature.name.startswith('fan'):
                             #print("%-25s %4d RPM" % (label+':', feature.get_value()))
                             html += "%-25s %4d RPM " % (label+':', feature.get_value())
-                            html += "<meter max=2000 min=0 value=%d high=1250 low=750 optimum=100></meter> <br>" % feature.get_value()
+                            html += "<meter max=2100 min=0 value=%d high=1500 low=750 optimum=100></meter> <br>" % feature.get_value()
                         if feature.name.startswith('temp'):
                             #print("%-27s %4.1f C" % (label+':', feature.get_value()))
                             html += "%-27s %4.1f&deg;C " % (label+':', feature.get_value())
@@ -191,6 +191,10 @@ class CherrySensors(object):
         zhtml = __zpool_div__ % get_zpool_status()
         uhtml = __usage_div__ % get_usage()
         html = create_table(shtml, thtml, zhtml, uhtml)
+
+        html += '   <div id="sensors" class="bookmark-inner-container">' \
+                '<a class="bookmark" href="/static/landing.html">Landing Page</a></div>'
+
         return self.redirect(html)
 
     def redirect(self, html):

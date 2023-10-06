@@ -1,4 +1,5 @@
 #!/bin/bash
+#set -x
 
 export ZPOOL_SCRIPTS_AS_ROOT=1
 
@@ -31,7 +32,7 @@ do
   
 done
 
-id=$(ls -l /dev/disk/by-id/ | grep 'nvme-.*' | grep -v -e 'eui\.' -e 'part' | awk -F' ' '{print $9}')
+id=$(ls -l /dev/disk/by-id/ | grep 'nvme-.*' | grep -v -e 'eui\.' -e 'part' -e '_1 ' -e '-00000001 ' | awk -F' ' '{print $9}')
 if [ "$id" != "" ]
 then
   echo "nvme0 "$(/usr/sbin/smartctl -a /dev/nvme0 | grep Temperature: | awk -F' ' '{print $2}')" Celsius "$id
